@@ -1,26 +1,140 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* ── Design tokens (editorial Swiss: ink / cream / rust) ─────────── */
+  --color-ink: #111110;
+  --color-ink-2: #1a1917;
+  --color-ink-3: #26241f;
+  --color-cream: #ede7da;
+  --color-cream-2: #e2dac8;
+  --color-cream-3: #d6ccb4;
+  --color-rust: #c4501e;
+  --color-rust-deep: #8f3a12;
+  --color-line-dark: rgba(17, 17, 16, 0.16);
+  --color-line-light: rgba(237, 231, 218, 0.16);
+
+  --font-display: var(--font-anton), sans-serif;
+  --font-sans: var(--font-archivo), sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
+
+  /* Type scale */
+  --text-giant: clamp(4.5rem, 17vw, 16rem);
+  --text-huge: clamp(3rem, 9vw, 8.5rem);
+  --text-big: clamp(2.25rem, 6vw, 5.5rem);
+  --text-lede: clamp(1.25rem, 2.6vw, 2.25rem);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-swift: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  scroll-behavior: auto; /* Lenis owns scrolling */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-rust);
+  color: var(--color-cream);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-rust);
+  outline-offset: 3px;
+}
+
+/* Display headline helper */
+.display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.88;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+}
+
+/* Mono eyebrow label */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* Mask-reveal line wrapper: <span class="mask"><span class="line">…</span></span>
+   Lines start visible; GSAP sets the offset itself so no-JS users still see text. */
+.mask {
+  display: block;
+  overflow: hidden;
+}
+.mask > .line {
+  display: block;
+}
+
+/* Word-scrub targets */
+.word {
+  display: inline-block;
+  white-space: pre;
+}
+
+/* Services mockup screen swap */
+@keyframes screenIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-speed, 42s) linear infinite;
+}
+.marquee-track.reverse {
+  animation-direction: reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+/* Thin rules */
+.rule-dark { border-color: var(--color-line-dark); }
+.rule-light { border-color: var(--color-line-light); }
+
+/* Grain overlay for warmth (fixed, non-interactive) */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
 }

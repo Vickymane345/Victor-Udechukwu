@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Victor Udechukwu — Portfolio
 
-## Getting Started
+Personal portfolio site for Victor Udechukwu, Mobile App & Web Developer.
+Editorial Swiss layout with scroll-driven motion.
 
-First, run the development server:
+**Live:** _add your Vercel URL here after deploying_
+
+## Stack
+
+- **Next.js 16** (App Router) + **TypeScript**
+- **Tailwind CSS 4** — design tokens live in `app/globals.css`
+- **GSAP + ScrollTrigger** — all scroll animation
+- **Lenis** — smooth scrolling, wired into the GSAP ticker
+- **pnpm** — package manager
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm build   # production build
+pnpm start   # serve the production build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Structure
 
-## Learn More
+```
+app/
+  layout.tsx        fonts, metadata, smooth-scroll provider
+  globals.css       design tokens (ink / cream / rust), type scale, utilities
+  page.tsx          section composition
+components/
+  Nav.tsx           fixed navigation
+  SmoothScroll.tsx  Lenis + GSAP ticker integration
+  Words.tsx         splits text for word-by-word scroll reveals
+  sections/         Hero, About, Manifesto, Services, Work, Stack, Contact
+lib/
+  data.ts           all copy: projects, services, posts, stack, links
+  gsap.ts           GSAP plugin registration (client only)
+```
 
-To learn more about Next.js, take a look at the following resources:
+**All content lives in `lib/data.ts`.** Edit projects, services, links, and the
+tech stack there — no need to touch component files.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Sections
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Hero** — layered type over portrait, mask reveal on load, parallax on scroll
+2. **About** — pinned section, profile reveals word by word
+3. **Manifesto** — scroll-scrubbed statement with a drifting image
+4. **Services** — sticky mockup that swaps screens per active competency
+5. **Selected Work** — project index with cursor-following previews, plus LinkedIn writing embeds
+6. **Stack** — dual marquee
+7. **Contact** — oversized CTA and footer
 
-## Deploy on Vercel
+## TODO
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Replace `picsum.photos` placeholders with real project screenshots in `public/`
+- `public/hero-portrait.jpg` is the hero and about portrait
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Accessibility & performance
+
+- Respects `prefers-reduced-motion` — all pinning and scrubbing is disabled, content renders static
+- Pinned and hover-dependent layouts degrade to plain vertical flow on mobile
+- Semantic landmarks, focus states, and screen-reader headings throughout
