@@ -10,7 +10,16 @@ const nextConfig: NextConfig = {
   },
   images: {
     // TODO: remove picsum once real project screenshots / portrait are added to /public
-    remotePatterns: [{ protocol: "https", hostname: "picsum.photos" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "picsum.photos" },
+      // Live-site screenshots for the auto-generated Work section
+      { protocol: "https", hostname: "api.microlink.io" },
+      { protocol: "https", hostname: "image.thum.io" },
+      { protocol: "https", hostname: "opengraph.githubassets.com" },
+    ],
+    // Screenshot services are rate-limited; cache each optimized result for a
+    // day so visitors never trigger a fresh capture.
+    minimumCacheTTL: 60 * 60 * 24,
   },
 };
 

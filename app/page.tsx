@@ -6,8 +6,17 @@ import Services from "@/components/sections/Services";
 import Work from "@/components/sections/Work";
 import Stack from "@/components/sections/Stack";
 import Contact from "@/components/sections/Contact";
+import { getProjects } from "@/lib/projects";
 
-export default function Home() {
+/**
+ * Projects are pulled live from GitHub + Vercel and cached for an hour, so a
+ * newly deployed repo appears here on its own. See lib/portfolio-config.ts.
+ */
+export const revalidate = 3600;
+
+export default async function Home() {
+  const projects = await getProjects();
+
   return (
     <>
       <Nav />
@@ -16,7 +25,7 @@ export default function Home() {
         <About />
         <Manifesto />
         <Services />
-        <Work />
+        <Work projects={projects} />
         <Stack />
       </main>
       <Contact />

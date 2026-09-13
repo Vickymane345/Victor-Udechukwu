@@ -1,16 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { PROJECTS, POSTS } from "@/lib/data";
+import { POSTS } from "@/lib/data";
+import type { LiveProject } from "@/lib/projects";
+import ProjectShot from "@/components/ProjectShot";
 
 /**
  * Selected Work — editorial index.
  * Desktop: numbered rows; hovering a row floats its preview beside the cursor.
  * Mobile: each row carries its own inline preview, no hover dependency.
+ *
+ * Projects arrive from app/page.tsx, which pulls them live from GitHub + Vercel.
  */
-export default function Work() {
+export default function Work({ projects }: { projects: LiveProject[] }) {
   const root = useRef<HTMLElement>(null);
   const preview = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<number | null>(null);
@@ -66,7 +69,7 @@ export default function Work() {
 
       return () => mm.revert();
     },
-    { scope: root }
+    { scope: root, dependencies: [projects.length] }
   );
 
   return (
@@ -88,56 +91,73 @@ export default function Work() {
         </h2>
       </div>
 
-      {/* Project index */}
+      {/* Project index — generated from GitHub + Vercel */}
       <ol className="mt-14 px-5 sm:px-8 md:mt-20 md:px-10">
-        {PROJECTS.map((project, i) => {
-          const Row = project.url ? "a" : "div";
-          return (
-            <li key={project.id} className="work-row border-t rule-light last:border-b">
-              <Row
-                {...(project.url
-                  ? {
-                      href: project.url,
-                      target: "_blank",
-                      rel: "noopener noreferrer",
-                    }
-                  : {})}
-                onMouseEnter={() => setActive(i)}
-                onMouseLeave={() => setActive(null)}
-                className="group flex flex-col gap-4 py-7 transition-colors duration-500 hover:text-rust md:flex-row md:items-center md:gap-8 md:py-10"
-              >
-                <span className="eyebrow w-8 shrink-0 text-cream/40">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+        {projects.map((project, i) => (
+          <li
+            key={project.id}
+            className="work-row relative border-t rule-light last:border-b"
+          >
+            <div
+              onMouseEnter={() => setActive(i)}
+              onMouseLeave={() => setActive(null)}
+              className="group flex flex-col gap-4 py-7 transition-colors duration-500 hover:text-rust md:flex-row md:items-center md:gap-8 md:py-10"
+            >
+              <span className="eyebrow w-8 shrink-0 text-cream/40">
+                {String(i + 1).padStart(2, "0")}
+              </span>
 
-                {/* Name with its tech stack directly beside it */}
-                <div className="flex flex-col gap-2 md:flex-1 md:flex-row md:items-baseline md:gap-6">
-                  <h3 className="display text-[clamp(1.75rem,6vw,4rem)] leading-none">
-                    {project.title}
-                  </h3>
-                  <p className="font-mono text-xs leading-relaxed text-cream/55">
-                    {project.stack}
-                  </p>
-                </div>
+              {/* Name with its tech stack directly beside it */}
+              <div className="flex flex-col gap-2 md:flex-1 md:flex-row md:items-baseline md:gap-6">
+                <h3 className="display text-[clamp(1.75rem,6vw,4rem)] leading-none">
+                  {project.url ? (
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      // Stretched link: the whole row is the click target,
+                      // which keeps the markup valid next to the repo link.
+                      className="after:absolute after:inset-0 after:content-['']"
+                    >
+                      {project.title}
+                    </a>
+                  ) : (
+                    project.title
+                  )}
+                </h3>
+                <p className="font-mono text-xs leading-relaxed text-cream/55">
+                  {project.stack}
+                </p>
+              </div>
 
-                {/* Inline preview on mobile only */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg md:hidden">
-                  <Image
-                    src={`https://picsum.photos/seed/${project.seed}/900/600`}
-                    alt={`${project.title} preview`}
-                    fill
-                    sizes="100vw"
-                    className="object-cover grayscale"
-                  />
-                </div>
+              {/* Inline preview on mobile only */}
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-ink-2 md:hidden">
+                <ProjectShot
+                  key={project.shot}
+                  src={project.shot}
+                  fallback={project.shotFallback}
+                  alt={`${project.title} preview`}
+                  sizes="100vw"
+                  className="object-cover grayscale"
+                />
+              </div>
 
-                <span className="eyebrow shrink-0 text-rust md:w-24 md:text-right">
+              <div className="flex shrink-0 items-center gap-5 md:w-40 md:justify-end">
+                <a
+                  href={project.repoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="eyebrow relative z-10 text-cream/50 transition-colors hover:text-cream"
+                >
+                  Code ↗
+                </a>
+                <span className="eyebrow text-rust">
                   {project.url ? "Visit ↗" : project.note ?? project.tag}
                 </span>
-              </Row>
-            </li>
-          );
-        })}
+              </div>
+            </div>
+          </li>
+        ))}
       </ol>
 
       {/* Floating cursor preview (desktop) */}
@@ -148,11 +168,12 @@ export default function Work() {
           active === null ? "opacity-0" : "opacity-100"
         }`}
       >
-        {active !== null && (
-          <Image
-            src={`https://picsum.photos/seed/${PROJECTS[active].seed}/1000/700`}
+        {active !== null && projects[active] && (
+          <ProjectShot
+            key={projects[active].shot}
+            src={projects[active].shot}
+            fallback={projects[active].shotFallback}
             alt=""
-            fill
             sizes="416px"
             className="object-cover grayscale contrast-110"
           />
