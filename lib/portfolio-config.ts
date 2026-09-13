@@ -32,6 +32,8 @@ export const HIDDEN_REPOS = [
   "PORTFOLIOS",
   "Portfolio",
   "portfolio-front-end-projects",
+  "snerga",
+  "sister",
 ];
 
 /** Forced to the top, in this order, ahead of the recency sort. */
@@ -59,11 +61,9 @@ export const REPO_OVERRIDES: Record<
 > = {
   ConvoyConnect: { title: "ConvoyConnect", tag: "Marketplace" },
   Culverin: { tag: "SaaS" },
-  snerga: { title: "Snerga", tag: "Product" },
   Ecommerce: { title: "E-Commerce Platform", tag: "E-Commerce" },
   School: { title: "Educational Landing Page", tag: "EdTech" },
   Gym: { title: "Gym Landing Page", tag: "Fitness" },
-  sister: { title: "Sister", tag: "Web" },
   "imdb-review-preprocessing": {
     title: "IMDB Review Preprocessing",
     tag: "NLP",

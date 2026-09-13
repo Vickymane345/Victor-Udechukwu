@@ -93,7 +93,12 @@ export default function Work({ projects }: { projects: LiveProject[] }) {
 
       {/* Project index — generated from GitHub + Vercel */}
       <ol className="mt-14 px-5 sm:px-8 md:mt-20 md:px-10">
-        {projects.map((project, i) => (
+        {projects.map((project, i) => {
+          // Undeployed work (notebooks, libraries) points at the repo instead,
+          // so every row has somewhere to go.
+          const href = project.url ?? project.repoUrl;
+
+          return (
           <li
             key={project.id}
             className="work-row relative border-t rule-light last:border-b"
@@ -110,20 +115,16 @@ export default function Work({ projects }: { projects: LiveProject[] }) {
               {/* Name with its tech stack directly beside it */}
               <div className="flex flex-col gap-2 md:flex-1 md:flex-row md:items-baseline md:gap-6">
                 <h3 className="display text-[clamp(1.75rem,6vw,4rem)] leading-none">
-                  {project.url ? (
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      // Stretched link: the whole row is the click target,
-                      // which keeps the markup valid next to the repo link.
-                      className="after:absolute after:inset-0 after:content-['']"
-                    >
-                      {project.title}
-                    </a>
-                  ) : (
-                    project.title
-                  )}
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    // Stretched link: the whole row is the click target,
+                    // which keeps the markup valid next to the repo link.
+                    className="after:absolute after:inset-0 after:content-['']"
+                  >
+                    {project.title}
+                  </a>
                 </h3>
                 <p className="font-mono text-xs leading-relaxed text-cream/55">
                   {project.stack}
@@ -143,21 +144,25 @@ export default function Work({ projects }: { projects: LiveProject[] }) {
               </div>
 
               <div className="flex shrink-0 items-center gap-5 md:w-40 md:justify-end">
-                <a
-                  href={project.repoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="eyebrow relative z-10 text-cream/50 transition-colors hover:text-cream"
-                >
-                  Code ↗
-                </a>
+                {/* Only worth a second link when the row already goes elsewhere */}
+                {project.url && (
+                  <a
+                    href={project.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="eyebrow relative z-10 text-cream/50 transition-colors hover:text-cream"
+                  >
+                    Code ↗
+                  </a>
+                )}
                 <span className="eyebrow text-rust">
-                  {project.url ? "Visit ↗" : project.note ?? project.tag}
+                  {project.url ? "Visit ↗" : "GitHub ↗"}
                 </span>
               </div>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ol>
 
       {/* Floating cursor preview (desktop) */}
